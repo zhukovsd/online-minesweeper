@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="online-minesweeper src" pattern="file[online-minesweeper]:src/main/java//*" />
+</component>
