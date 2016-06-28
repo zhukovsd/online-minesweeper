@@ -18,9 +18,7 @@
 package com.zhukovsd.experiments;
 
 import com.google.common.base.Strings;
-import com.zhukovsd.endlessfield.CellPosition;
-import com.zhukovsd.endlessfield.ChunkIdGenerator;
-import com.zhukovsd.endlessfield.ChunkSize;
+import com.zhukovsd.endlessfield.*;
 import com.zhukovsd.endlessfield.field.EndlessFieldChunk;
 import com.zhukovsd.endlessfield.fielddatasource.EndlessFieldDataSource;
 import com.zhukovsd.entrylockingconcurrenthashmap.EntryLockingConcurrentHashMap;
@@ -36,6 +34,7 @@ public class FieldGenerationConsistencyExperiment {
     public static void main(String[] args) throws InterruptedException {
         MinesweeperField field = new MinesweeperField(
                 15000, new ChunkSize(5, 5),
+                new EndlessFieldSizeConstraints(3, 3),
                 new EndlessFieldDataSource<MinesweeperFieldCell>() {
                     @Override
                     public boolean containsChunk(Integer chunkId) {
@@ -89,41 +88,76 @@ public class FieldGenerationConsistencyExperiment {
         try {
             Map<CellPosition, MinesweeperFieldCell> entries = field.getEntriesByChunkIds(chunkSet);
 
-            StringBuilder sb = new StringBuilder();
-            String rowDelimiter = "";
-            for (int row = 0; row < field.chunkSize.rowCount * (maxChunkRow + 1); row++) {
-                sb.append(rowDelimiter);
-
-                String cellDelimiter = "";
-                for (int column = 0; column < field.chunkSize.columnCount * (maxChunkColumn + 1); column++) {
-                    sb.append(cellDelimiter);
-
-                    MinesweeperFieldCell cell = entries.get(new CellPosition(row, column));
-                    if (cell.hasMine())
-                        sb.append('*');
-                    else {
-                        int count = cell.neighbourMinesCount();
-                        if (count >= 0)
-                            sb.append(count);
-                        else
-                            sb.append('-');
-                    }
-
-                    if ((column + 1) % field.chunkSize.columnCount == 0)
-                        cellDelimiter = "|";
-                    else
-                        cellDelimiter = " ";
-                }
-
-                if ((row + 1) % field.chunkSize.rowCount == 0)
-                    rowDelimiter = "\n" + Strings.repeat("--", field.chunkSize.columnCount * (maxChunkColumn + 1) - 1) + "-\n";
-                else
-                    rowDelimiter = "\n";
-            }
-
-            System.out.println(sb.toString());
+            printField(field, maxChunkColumn, maxChunkRow, entries);
+            checkFieldConsistency(field, maxChunkColumn, maxChunkRow, entries);
         } finally {
             field.unlockChunks();
+        }
+    }
+
+    private static void printField(
+            MinesweeperField field, int maxChunkColumn, int maxChunkRow, Map<CellPosition, MinesweeperFieldCell> entries
+    ) {
+        StringBuilder sb = new StringBuilder();
+        String rowDelimiter = "";
+        for (int row = 0; row < field.chunkSize.rowCount * (maxChunkRow + 1); row++) {
+            sb.append(rowDelimiter);
+
+            String cellDelimiter = "";
+            for (int column = 0; column < field.chunkSize.columnCount * (maxChunkColumn + 1); column++) {
+                sb.append(cellDelimiter);
+
+                MinesweeperFieldCell cell = entries.get(new CellPosition(row, column));
+                if (cell.hasMine())
+                    sb.append('*');
+                else {
+                    int count = cell.neighbourMinesCount();
+                    if (count >= 0)
+                        sb.append(count);
+                    else
+                        sb.append('-');
+                }
+
+                if ((column + 1) % field.chunkSize.columnCount == 0)
+                    cellDelimiter = "|";
+                else
+                    cellDelimiter = " ";
+            }
+
+            if ((row + 1) % field.chunkSize.rowCount == 0)
+                rowDelimiter = "\n" + Strings.repeat("--", field.chunkSize.columnCount * (maxChunkColumn + 1) - 1) + "-\n";
+            else
+                rowDelimiter = "\n";
+        }
+
+        System.out.println(sb.toString());
+    }
+
+    private static void checkFieldConsistency(
+            MinesweeperField field, int maxChunkColumn, int maxChunkRow, Map<CellPosition, MinesweeperFieldCell> entries
+    ) {
+        for (int row = 0; row < field.chunkSize.rowCount * (maxChunkRow + 1); row++) {
+            for (int column = 0; column < field.chunkSize.columnCount * (maxChunkColumn + 1); column++) {
+                CellPosition position = new CellPosition(row, column);
+                MinesweeperFieldCell cell = entries.get(position);
+
+                if (!cell.hasMine()) {
+                    EndlessFieldArea neighbourArea = new EndlessFieldArea(field, position, 1, 1).expandFromCenter(1);
+
+                    int neighbourMinesCount = 0;
+                    for (CellPosition neighbourPosition : neighbourArea) {
+                        if (!neighbourPosition.equals(position)) {
+                            if (entries.get(neighbourPosition).hasMine())
+                                neighbourMinesCount++;
+                        }
+                    }
+
+                    if (cell.neighbourMinesCount() != neighbourMinesCount) {
+                        System.out.println("incorrect neighbour mines count at " + position);
+                        break;
+                    }
+                }
+            }
         }
     }
 }

@@ -18,6 +18,7 @@
 package com.zhukovsd.minesweeperfield;
 
 import com.zhukovsd.endlessfield.ChunkSize;
+import com.zhukovsd.endlessfield.EndlessFieldSizeConstraints;
 import com.zhukovsd.endlessfield.field.EndlessField;
 import com.zhukovsd.endlessfield.field.EndlessFieldActionInvoker;
 import com.zhukovsd.endlessfield.field.EndlessFieldCellFactory;
@@ -28,8 +29,12 @@ import com.zhukovsd.endlessfield.fielddatasource.EndlessFieldDataSource;
  * Created by ZhukovSD on 26.06.2016.
  */
 public class MinesweeperField extends EndlessField<MinesweeperFieldCell> {
-    public MinesweeperField(int stripes, ChunkSize chunkSize, EndlessFieldDataSource<MinesweeperFieldCell> dataSource, EndlessFieldCellFactory<MinesweeperFieldCell> cellFactory) {
-        super(stripes, chunkSize, dataSource, cellFactory);
+    public MinesweeperField(
+            int stripes, ChunkSize chunkSize, EndlessFieldSizeConstraints sizeConstraints,
+            EndlessFieldDataSource<MinesweeperFieldCell> dataSource,
+            EndlessFieldCellFactory<MinesweeperFieldCell> cellFactory
+    ) {
+        super(stripes, chunkSize, sizeConstraints, dataSource, cellFactory);
     }
 
     @Override
