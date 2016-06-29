@@ -21,6 +21,7 @@ import com.zhukovsd.endlessfield.CellPosition;
 import com.zhukovsd.endlessfield.ChunkIdGenerator;
 import com.zhukovsd.endlessfield.EndlessFieldArea;
 import com.zhukovsd.endlessfield.field.EndlessField;
+import com.zhukovsd.endlessfield.field.EndlessFieldCell;
 import com.zhukovsd.endlessfield.field.EndlessFieldChunk;
 import com.zhukovsd.endlessfield.field.EndlessFieldChunkFactory;
 
@@ -85,19 +86,20 @@ public class MinesweeperFieldChunkFactory extends EndlessFieldChunkFactory<Mines
         EndlessFieldArea chunkArea = ChunkIdGenerator.chunkAreaById(field, chunkId);
         EndlessFieldArea innerArea = ChunkIdGenerator.chunkAreaById(field, chunkId).narrowToCenter(1);
 
+        HashMap<CellPosition, EndlessFieldCell> modifiedEntries = new HashMap<>();
+
         // border cells lays in chunkArea, but not in innerArea
-        int c = 0;
         for (CellPosition position : chunkArea) {
             if (!innerArea.contains(position)) {
-                c++;
                 MinesweeperFieldCell cell = chunk.get(position);
-                if (!cell.hasMine()) {
-                    EndlessFieldArea neighbourArea = new EndlessFieldArea(field, position, 1, 1).expandFromCenter(1);
 
+                EndlessFieldArea neighbourArea = new EndlessFieldArea(field, position, 1, 1).expandFromCenter(1);
+
+                if (!cell.hasMine()) {
                     int neighbourMinesCount = 0;
                     for (CellPosition neighbourCellPosition : neighbourArea) {
                         if (!neighbourCellPosition.equals(position)) {
-                            int neighbourCellChunkId = ChunkIdGenerator.generateID(field.chunkSize, neighbourCellPosition);
+                            int neighbourCellChunkId = ChunkIdGenerator.chunkIdByPosition(field.chunkSize, neighbourCellPosition);
 
                             if (lockedChunkIds.contains(neighbourCellChunkId)) {
                                 if (field.getCell(neighbourCellPosition).hasMine())
@@ -110,10 +112,24 @@ public class MinesweeperFieldChunkFactory extends EndlessFieldChunkFactory<Mines
                     }
 
                     cell.setNeighbourMinesCount(neighbourMinesCount);
+                } else {
+                    for (CellPosition neighbourCellPosition : neighbourArea) {
+                        int neighbourCellChunkId = ChunkIdGenerator.chunkIdByPosition(field.chunkSize, neighbourCellPosition);
+
+                        if (lockedChunkIds.contains(neighbourCellChunkId)) {
+                            MinesweeperFieldCell neighbourCell = field.getCell(neighbourCellPosition);
+
+                            neighbourCell.setNeighbourMinesCount(neighbourCell.neighbourMinesCount() + 1);
+                            modifiedEntries.put(neighbourCellPosition, neighbourCell);
+                        }
+                    }
                 }
             }
-        }
 
-//        System.out.println("c = " + c);
+            if (modifiedEntries.size() > 0) {
+//                System.out.println(modifiedEntries.size() + " cells were updated");
+                field.updateEntries(modifiedEntries);
+            }
+        }
     }
 }

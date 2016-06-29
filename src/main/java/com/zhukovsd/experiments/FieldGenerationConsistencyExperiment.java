@@ -69,6 +69,8 @@ public class FieldGenerationConsistencyExperiment {
         Set<Integer> chunkSet = new HashSet<>();
 
         for (List<Integer> chunkIds : lockOrder) {
+            System.out.println("locking chunks " + chunkIds.toString());
+
             field.lockChunksByIds(chunkIds);
             try {
                 for (Integer chunkId : chunkIds) {
@@ -159,5 +161,7 @@ public class FieldGenerationConsistencyExperiment {
                 }
             }
         }
+
+        System.out.println("chunks are correct!");
     }
 }

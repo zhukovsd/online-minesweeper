@@ -17,13 +17,18 @@
 
 package com.zhukovsd.minesweeperfield;
 
+import com.zhukovsd.endlessfield.ChunkIdGenerator;
 import com.zhukovsd.endlessfield.ChunkSize;
+import com.zhukovsd.endlessfield.EndlessFieldArea;
 import com.zhukovsd.endlessfield.EndlessFieldSizeConstraints;
 import com.zhukovsd.endlessfield.field.EndlessField;
 import com.zhukovsd.endlessfield.field.EndlessFieldActionInvoker;
 import com.zhukovsd.endlessfield.field.EndlessFieldCellFactory;
 import com.zhukovsd.endlessfield.field.EndlessFieldChunkFactory;
 import com.zhukovsd.endlessfield.fielddatasource.EndlessFieldDataSource;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by ZhukovSD on 26.06.2016.
@@ -45,5 +50,17 @@ public class MinesweeperField extends EndlessField<MinesweeperFieldCell> {
     @Override
     protected EndlessFieldChunkFactory<MinesweeperFieldCell> createChunkFactory() {
         return new MinesweeperFieldChunkFactory(this, 15);
+    }
+
+    @Override
+    protected Set<Integer> relatedChunks(Integer chunkId) {
+        HashSet<Integer> result = new HashSet<>();
+
+        EndlessFieldArea area = ChunkIdGenerator.chunkAreaById(this, chunkId);
+        area = area.expandFromCenter(1);
+        result.addAll(ChunkIdGenerator.chunkIdsByArea(chunkSize, area));
+        result.remove(chunkId);
+
+        return result;
     }
 }
