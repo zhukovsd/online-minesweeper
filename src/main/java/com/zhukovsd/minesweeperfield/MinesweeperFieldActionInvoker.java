@@ -25,7 +25,7 @@ import com.zhukovsd.endlessfield.field.EndlessFieldActionInvoker;
  * Created by ZhukovSD on 27.06.2016.
  */
 public class MinesweeperFieldActionInvoker extends EndlessFieldActionInvoker {
-    protected MinesweeperFieldActionInvoker(EndlessField<?> field) {
+    MinesweeperFieldActionInvoker(EndlessField<?> field) {
         super(field);
     }
 
