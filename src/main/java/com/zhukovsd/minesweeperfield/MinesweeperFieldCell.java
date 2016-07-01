@@ -25,7 +25,8 @@ import com.zhukovsd.endlessfield.field.EndlessFieldCell;
  */
 public class MinesweeperFieldCell extends EndlessFieldCell {
     private boolean isOpen = false;
-    private boolean hasMine;
+    // TODO: 01.07.2016 private
+    public boolean hasMine;
     private int neighbourMinesCount = -1;
 
     public MinesweeperFieldCell(boolean hasMine) {

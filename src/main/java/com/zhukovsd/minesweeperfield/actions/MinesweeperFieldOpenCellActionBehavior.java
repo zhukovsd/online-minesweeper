@@ -34,10 +34,25 @@ import java.util.*;
 public class MinesweeperFieldOpenCellActionBehavior implements EndlessFieldActionBehavior {
     @Override
     public Collection<Integer> getChunkIds(EndlessField<? extends EndlessFieldCell> field, CellPosition position) {
-//        return null;
-        // TODO: 29.06.2016 add rows and columns in expandFromCenter() method
-        EndlessFieldArea area = new EndlessFieldArea(field, position, 1, 1).expandFromCenter(field.chunkSize.rowCount);
+        // all 8 adjacent chunks
+        EndlessFieldArea area = new EndlessFieldArea(field, position, 1, 1).expandFromCenter(
+                field.chunkSize.rowCount, field.chunkSize.columnCount
+        );
         return ChunkIdGenerator.chunkIdsByArea(field.chunkSize, area);
+
+        // max 5 chunks, top left bottom right
+//        HashSet<Integer> result = new HashSet<>();
+//        EndlessFieldArea area = new EndlessFieldArea(field, position, 1, 1).expandFromCenter(
+//                field.chunkSize.rowCount, 0
+//        );
+//        result.addAll(ChunkIdGenerator.chunkIdsByArea(field.chunkSize, area));
+//
+//        area = new EndlessFieldArea(field, position, 1, 1).expandFromCenter(
+//                0, field.chunkSize.columnCount
+//        );
+//        result.addAll(ChunkIdGenerator.chunkIdsByArea(field.chunkSize, area));
+//
+//        return result;
     }
 
     @Override

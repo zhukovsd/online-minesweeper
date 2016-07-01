@@ -34,8 +34,11 @@ import java.util.*;
  * Created by ZhukovSD on 28.06.2016.
  */
 public class FieldGenerationConsistencyExperiment {
+    private static int cellCount;
+    private static HashMap<Integer, Integer> mineCounts = new HashMap<>();
+
     public static void main(String[] args) throws InterruptedException {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 50; i++) {
             run();
 
             if ((i > 0) && (i % 1 == 0))
@@ -46,6 +49,16 @@ public class FieldGenerationConsistencyExperiment {
                         ((double) MinesweeperFieldChunkFactory.tryCount.get()) / ((double) MinesweeperFieldChunkFactory.count.get())
                 );
         }
+
+        Optional<Integer> overallMineCount = mineCounts.values().stream().reduce(Integer::sum);
+        System.out.println(
+                "overall mine odds = " + ((double) overallMineCount.get()) / cellCount * 100 + "%"
+        );
+
+        System.out.println("mine counts by column:");
+        mineCounts.keySet().stream().sorted().forEach(
+                key -> System.out.println(key + " -> " + mineCounts.get(key).toString())
+        );
     }
 
     private static void run() throws InterruptedException {
@@ -77,9 +90,18 @@ public class FieldGenerationConsistencyExperiment {
         );
 
         List<List<Integer>> lockOrder = Arrays.asList(
-                Arrays.asList(0, 1, 2),
-                Arrays.asList(40000, 40001, 40002),
-                Arrays.asList(80000, 80001, 80002)
+//                Arrays.asList(0, 1, 2),
+//                Arrays.asList(40000, 40001, 40002),
+//                Arrays.asList(80000, 80001, 80002)
+                Collections.singletonList(0),
+                Collections.singletonList(1),
+                Collections.singletonList(2),
+                Collections.singletonList(40000),
+                Collections.singletonList(40001),
+                Collections.singletonList(40002),
+                Collections.singletonList(80000),
+                Collections.singletonList(80001),
+                Collections.singletonList(80002)
         );
 
         int maxChunkColumn = 0, maxChunkRow = 0;
@@ -113,12 +135,25 @@ public class FieldGenerationConsistencyExperiment {
             field.unlockChunks();
         }
 
-        openFieldCells(field, maxChunkColumn, maxChunkRow);
+        try {
+            openFieldCells(field, maxChunkColumn, maxChunkRow);
+        } catch (Exception e ){
+            System.out.println("cells opening error - " + e.getMessage());
+
+            field.lockChunksByIds(chunkSet);
+            try {
+                Map<CellPosition, MinesweeperFieldCell> entries = field.getEntriesByChunkIds(chunkSet);
+                printField(field, maxChunkColumn, maxChunkRow, entries);
+            } finally {
+                field.unlockChunks();
+            }
+        }
 
         field.lockChunksByIds(chunkSet);
         try {
             Map<CellPosition, MinesweeperFieldCell> entries = field.getEntriesByChunkIds(chunkSet);
 //            printField(field, maxChunkColumn, maxChunkRow, entries);
+            countMines(field, maxChunkColumn, maxChunkRow, entries);
         } finally {
             field.unlockChunks();
         }
@@ -194,26 +229,42 @@ public class FieldGenerationConsistencyExperiment {
 //        System.out.println("chunks are correct!");
     }
 
-    private static void openFieldCells(MinesweeperField field, int maxChunkColumn, int maxChunkRow) {
-        try {
-            MinesweeperFieldAction action = MinesweeperFieldAction.OPEN_CELL;
+    private static void openFieldCells(MinesweeperField field, int maxChunkColumn, int maxChunkRow) throws InterruptedException {
+        MinesweeperFieldAction action = MinesweeperFieldAction.OPEN_CELL;
 
-            for (int i = 0; i < field.chunkSize.rowCount * (maxChunkRow + 1); i++) {
-                for (int j = 0; j < field.chunkSize.columnCount * (maxChunkColumn + 1); j++) {
-                    CellPosition position = new CellPosition(i, j);
+        for (int i = 0; i < field.chunkSize.rowCount * (maxChunkRow + 1); i++) {
+            for (int j = 0; j < field.chunkSize.columnCount * (maxChunkColumn + 1); j++) {
+                CellPosition position = new CellPosition(i, j);
 
-                    Collection<Integer> chunkIds = action.getChunkIds(field, position);
-                    field.lockChunksByIds(chunkIds);
-                    try {
-                        LinkedHashMap<CellPosition, ? extends EndlessFieldCell> map = action.perform(field, position);
+                Collection<Integer> chunkIds = action.getChunkIds(field, position);
+                field.lockChunksByIds(chunkIds);
+                try {
+                    LinkedHashMap<CellPosition, ? extends EndlessFieldCell> map = action.perform(field, position);
 //                        System.out.println(map.size() + " cells opened");
-                    } finally {
-                        field.unlockChunks();
-                    }
+                } finally {
+                    field.unlockChunks();
                 }
             }
-        } catch (Exception e) {
-            System.out.println("cells opening error - " + e.getClass().getSimpleName());
+        }
+    }
+
+    private static void countMines(
+            MinesweeperField field, int maxChunkColumn, int maxChunkRow, Map<CellPosition, MinesweeperFieldCell> entries
+    ) {
+        for (int i = 0; i < field.chunkSize.rowCount * (maxChunkRow + 1); i++) {
+            for (int j = 0; j < field.chunkSize.columnCount * (maxChunkColumn + 1); j++) {
+                cellCount++;
+                CellPosition position = new CellPosition(i, j);
+
+                if (entries.get(position).hasMine()) {
+                    Integer index = j % field.chunkSize.columnCount;
+
+                    if (!mineCounts.containsKey(index))
+                        mineCounts.put(index, 1);
+                    else
+                        mineCounts.put(index, mineCounts.get(index) + 1);
+                }
+            }
         }
     }
 }

@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MinesweeperFieldChunkFactory extends EndlessFieldChunkFactory<MinesweeperFieldCell> {
     static class CellVertex extends Vertex<CellVertex> {}
     enum Side {
-        LEFT, TOP, RIGHT, BOTTOM;
+        LEFT, TOP, RIGHT, BOTTOM
     }
 
     public static AtomicInteger count = new AtomicInteger(), tryCount = new AtomicInteger();
@@ -69,7 +69,7 @@ public class MinesweeperFieldChunkFactory extends EndlessFieldChunkFactory<Mines
 
             // TODO: 30.06.2016 remove debug
             //<editor-fold desc="print chunk with id 0">
-//            if (chunkId == 80001) {
+//            if ((chunkId == 2) || (chunkId == 40001)) {
 //                CellPosition origin = ChunkIdGenerator.chunkOrigin(field.chunkSize, chunkId);
 //
 //                StringBuilder sb = new StringBuilder();
@@ -121,19 +121,49 @@ public class MinesweeperFieldChunkFactory extends EndlessFieldChunkFactory<Mines
 
         for (CellPosition position : chunkArea) {
             boolean hasMine;
-//            if (chunkId != 80001) {
-                hasMine = rand.nextInt(100) < mineOdds;
-//            } else {
-//                CellPosition p1 = new CellPosition(10, 7),
-//                        p2 = new CellPosition(10, 8),
-//                        p3 = new CellPosition(11, 6),
-//                        p4 = new CellPosition(14, 9);
-//
-//                hasMine = position.equals(p1) || position.equals(p2) || position.equals(p3) || position.equals(p4);
-//            }
+            hasMine = rand.nextInt(100) < mineOdds;
 
             chunk.put(position, new MinesweeperFieldCell(hasMine));
         }
+
+//        if (chunkId == 0) {
+//            Set<CellPosition> set = new HashSet<>(Arrays.asList(
+//                    new CellPosition(0, 0), new CellPosition(0, 3), new CellPosition(2, 4),
+//                    new CellPosition(3, 0), new CellPosition(4, 2)
+//            ));
+//
+//            for (CellPosition position : chunkArea) {
+//                chunk.get(position).hasMine = set.contains(position);
+//            }
+//        } else if (chunkId == 40000) {
+//            Set<CellPosition> set = new HashSet<>(Arrays.asList(
+//                    new CellPosition(6, 0), new CellPosition(6, 3),
+//                    new CellPosition(8, 0), new CellPosition(8, 3)
+//            ));
+//
+//            for (CellPosition position : chunkArea) {
+//                chunk.get(position).hasMine = set.contains(position);
+//            }
+//        } else if (chunkId == 1) {
+//            Set<CellPosition> set = new HashSet<>(Arrays.asList(
+//                    new CellPosition(1, 6), new CellPosition(1, 9),
+//                    new CellPosition(3, 6), new CellPosition(3, 9)
+//            ));
+//
+//            for (CellPosition position : chunkArea) {
+//                chunk.get(position).hasMine = set.contains(position);
+//            }
+//        } else if (chunkId == 40001) {
+//            Set<CellPosition> set = new HashSet<>(Arrays.asList(
+//                    new CellPosition(5, 7), new CellPosition(7, 5),
+//                    new CellPosition(6, 9), new CellPosition(9, 6),
+//                    new CellPosition(9, 9)
+//            ));
+//
+//            for (CellPosition position : chunkArea) {
+//                chunk.get(position).hasMine = set.contains(position);
+//            }
+//        }
     }
 
     private void calculateNeighbourMinesDisregardingRelatedChunks(EndlessFieldChunk<MinesweeperFieldCell> chunk, int chunkId) {
@@ -161,6 +191,9 @@ public class MinesweeperFieldChunkFactory extends EndlessFieldChunkFactory<Mines
     private void calculateNeighbourMinesCountForBorderCells(
             EndlessFieldChunk<MinesweeperFieldCell> chunk, Integer chunkId, Collection<Integer> lockedChunkIds
     ) {
+//        if (chunkId == 40001)
+//            System.out.println(123);
+
         EndlessFieldArea chunkArea = ChunkIdGenerator.chunkAreaById(field, chunkId);
         EndlessFieldArea innerArea = ChunkIdGenerator.chunkAreaById(field, chunkId).narrowToCenter(1);
 
@@ -287,7 +320,7 @@ public class MinesweeperFieldChunkFactory extends EndlessFieldChunkFactory<Mines
                 originArea = new EndlessFieldArea(
                         field, new CellPosition(bottomRow, chunkOrigin.column + 1), 1, field.chunkSize.columnCount - 2
                 );
-            } else {
+            } else /*if (side == Side.RIGHT)*/ {
                 originArea = new EndlessFieldArea(
                         field, new CellPosition(chunkOrigin.row + 1, rightColumn), field.chunkSize.rowCount - 2, 1
                 );
