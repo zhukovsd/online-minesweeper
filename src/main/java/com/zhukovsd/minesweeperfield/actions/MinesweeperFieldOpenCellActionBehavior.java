@@ -23,6 +23,7 @@ import com.zhukovsd.endlessfield.EndlessFieldArea;
 import com.zhukovsd.endlessfield.field.EndlessField;
 import com.zhukovsd.endlessfield.field.EndlessFieldActionBehavior;
 import com.zhukovsd.endlessfield.field.EndlessFieldCell;
+import com.zhukovsd.minesweeperfield.MinesweeperField;
 import com.zhukovsd.minesweeperfield.MinesweeperFieldCell;
 
 import java.util.*;
@@ -43,10 +44,63 @@ public class MinesweeperFieldOpenCellActionBehavior implements EndlessFieldActio
     public LinkedHashMap<CellPosition, ? extends EndlessFieldCell> perform(
             EndlessField<? extends EndlessFieldCell> field, CellPosition position
     ) {
-        Map<CellPosition, ? extends EndlessFieldCell> entries = field.getEntriesByChunkIds(getChunkIds(field, position));
+        int c = 0;
+        HashSet<CellPosition> positions = new HashSet<>();
 
-//        checkedMap.putAll(field.getEntriesByChunkIds(getChunkIds(field, position)));
+        LinkedHashMap<CellPosition, EndlessFieldCell> result = new LinkedHashMap<>();
+        MinesweeperField minesweeperField = (MinesweeperField) field;
 
-        return null;
+        MinesweeperFieldCell actionCell = minesweeperField.getCell(position);
+        if (!actionCell.isOpen() && !actionCell.hasMine()) {
+//            Map<CellPosition, MinesweeperFieldCell> entries = minesweeperField.getEntriesByChunkIds(getChunkIds(field, position));
+
+            LinkedHashMap<CellPosition, MinesweeperFieldCell> cellsToOpen = new LinkedHashMap<>();
+
+//            MinesweeperFieldCell actionCell = entries.get(position);
+//            MinesweeperFieldCell actionCell = minesweeperField.getCell(position);
+//            if (!actionCell.isOpen() && !actionCell.hasMine()) {
+                cellsToOpen.put(position, actionCell);
+//            }
+
+            while (!cellsToOpen.isEmpty()) {
+                Map.Entry<CellPosition, MinesweeperFieldCell> entry = cellsToOpen.entrySet().iterator().next();
+
+                CellPosition openCellPosition = entry.getKey();
+                MinesweeperFieldCell cell = cellsToOpen.remove(openCellPosition);
+
+                synchronized (cell) {
+                    cell.open();
+                }
+                result.put(openCellPosition, cell);
+
+                if (cell.neighbourMinesCount() == 0) {
+                    EndlessFieldArea neighboursArea = new EndlessFieldArea(field, openCellPosition, 1, 1).expandFromCenter(1);
+                    for (CellPosition neighbourCellPosition : neighboursArea) {
+                        if (!openCellPosition.equals(neighbourCellPosition)) {
+
+                            //
+                            c++;
+                            positions.add(neighbourCellPosition);
+                            //
+
+
+//                            MinesweeperFieldCell neighbourCell = entries.get(neighbourCellPosition);
+                            MinesweeperFieldCell neighbourCell = minesweeperField.getCell(neighbourCellPosition);
+                            if (!neighbourCell.isOpen() && !neighbourCell.hasMine()) {
+                                cellsToOpen.put(neighbourCellPosition, neighbourCell);
+                            }
+                        }
+                    }
+                }
+            }
+
+//            if (c > 0)
+//                System.out.println(
+//                        "c = " + c + ", set size = " + positions.size() + ", ratio = "
+//                                + ((double) c) / ((double) positions.size())
+//                );
+        }
+
+        return result;
     }
 }

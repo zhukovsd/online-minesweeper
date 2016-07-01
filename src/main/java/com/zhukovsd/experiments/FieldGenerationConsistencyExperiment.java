@@ -19,11 +19,14 @@ package com.zhukovsd.experiments;
 
 import com.google.common.base.Strings;
 import com.zhukovsd.endlessfield.*;
+import com.zhukovsd.endlessfield.field.EndlessFieldCell;
 import com.zhukovsd.endlessfield.field.EndlessFieldChunk;
 import com.zhukovsd.endlessfield.fielddatasource.EndlessFieldDataSource;
 import com.zhukovsd.entrylockingconcurrenthashmap.EntryLockingConcurrentHashMap;
 import com.zhukovsd.minesweeperfield.MinesweeperField;
 import com.zhukovsd.minesweeperfield.MinesweeperFieldCell;
+import com.zhukovsd.minesweeperfield.MinesweeperFieldChunkFactory;
+import com.zhukovsd.minesweeperfield.actions.MinesweeperFieldAction;
 
 import java.util.*;
 
@@ -32,8 +35,22 @@ import java.util.*;
  */
 public class FieldGenerationConsistencyExperiment {
     public static void main(String[] args) throws InterruptedException {
+        for (int i = 0; i < 100; i++) {
+            run();
+
+            if ((i > 0) && (i % 1 == 0))
+                System.out.format(
+                        "#%s, count = %s, try count = %s, ratio = %s\n",
+                        i, MinesweeperFieldChunkFactory.count,
+                        MinesweeperFieldChunkFactory.tryCount,
+                        ((double) MinesweeperFieldChunkFactory.tryCount.get()) / ((double) MinesweeperFieldChunkFactory.count.get())
+                );
+        }
+    }
+
+    private static void run() throws InterruptedException {
         MinesweeperField field = new MinesweeperField(
-                15000, new ChunkSize(5, 5),
+                15000, new ChunkSize(50, 50),
                 new EndlessFieldSizeConstraints(3, 3),
                 new EndlessFieldDataSource<MinesweeperFieldCell>() {
                     @Override
@@ -69,7 +86,7 @@ public class FieldGenerationConsistencyExperiment {
         Set<Integer> chunkSet = new HashSet<>();
 
         for (List<Integer> chunkIds : lockOrder) {
-            System.out.println("locking chunks " + chunkIds.toString());
+//            System.out.println("locking chunks " + chunkIds.toString());
 
             field.lockChunksByIds(chunkIds);
             try {
@@ -90,8 +107,18 @@ public class FieldGenerationConsistencyExperiment {
         try {
             Map<CellPosition, MinesweeperFieldCell> entries = field.getEntriesByChunkIds(chunkSet);
 
-            printField(field, maxChunkColumn, maxChunkRow, entries);
+//            printField(field, maxChunkColumn, maxChunkRow, entries);
             checkFieldConsistency(field, maxChunkColumn, maxChunkRow, entries);
+        } finally {
+            field.unlockChunks();
+        }
+
+        openFieldCells(field, maxChunkColumn, maxChunkRow);
+
+        field.lockChunksByIds(chunkSet);
+        try {
+            Map<CellPosition, MinesweeperFieldCell> entries = field.getEntriesByChunkIds(chunkSet);
+//            printField(field, maxChunkColumn, maxChunkRow, entries);
         } finally {
             field.unlockChunks();
         }
@@ -110,7 +137,9 @@ public class FieldGenerationConsistencyExperiment {
                 sb.append(cellDelimiter);
 
                 MinesweeperFieldCell cell = entries.get(new CellPosition(row, column));
-                if (cell.hasMine())
+                if (cell.isOpen())
+                    sb.append('X');
+                else if (cell.hasMine())
                     sb.append('*');
                 else {
                     int count = cell.neighbourMinesCount();
@@ -162,6 +191,29 @@ public class FieldGenerationConsistencyExperiment {
             }
         }
 
-        System.out.println("chunks are correct!");
+//        System.out.println("chunks are correct!");
+    }
+
+    private static void openFieldCells(MinesweeperField field, int maxChunkColumn, int maxChunkRow) {
+        try {
+            MinesweeperFieldAction action = MinesweeperFieldAction.OPEN_CELL;
+
+            for (int i = 0; i < field.chunkSize.rowCount * (maxChunkRow + 1); i++) {
+                for (int j = 0; j < field.chunkSize.columnCount * (maxChunkColumn + 1); j++) {
+                    CellPosition position = new CellPosition(i, j);
+
+                    Collection<Integer> chunkIds = action.getChunkIds(field, position);
+                    field.lockChunksByIds(chunkIds);
+                    try {
+                        LinkedHashMap<CellPosition, ? extends EndlessFieldCell> map = action.perform(field, position);
+//                        System.out.println(map.size() + " cells opened");
+                    } finally {
+                        field.unlockChunks();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("cells opening error - " + e.getClass().getSimpleName());
+        }
     }
 }

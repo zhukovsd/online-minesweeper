@@ -57,4 +57,9 @@ public class MinesweeperFieldCell extends EndlessFieldCell {
     public void setNeighbourMinesCount(int count) {
         neighbourMinesCount = count;
     }
+
+    public void open() {
+        if (!hasMine())
+            isOpen = true;
+    }
 }
