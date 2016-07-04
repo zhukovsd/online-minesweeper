@@ -20,6 +20,7 @@ package com.zhukovsd.minesweeperfield;
 import com.zhukovsd.endlessfield.field.EndlessField;
 import com.zhukovsd.endlessfield.field.EndlessFieldAction;
 import com.zhukovsd.endlessfield.field.EndlessFieldActionInvoker;
+import com.zhukovsd.minesweeperfield.actions.MinesweeperFieldAction;
 
 /**
  * Created by ZhukovSD on 27.06.2016.
@@ -31,6 +32,6 @@ public class MinesweeperFieldActionInvoker extends EndlessFieldActionInvoker {
 
     @Override
     public EndlessFieldAction selectActionByNumber(int number) {
-        return null;
+        return MinesweeperFieldAction.values()[number];
     }
 }

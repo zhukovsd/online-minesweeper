@@ -60,7 +60,6 @@ public class FieldGenerationPerformanceExperiment {
 
                     }
                 }
-                ,null
         );
 
         MinesweeperFieldChunkFactory factory = new MinesweeperFieldChunkFactory(field, 15);

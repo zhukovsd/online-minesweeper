@@ -23,7 +23,6 @@ import com.zhukovsd.endlessfield.EndlessFieldArea;
 import com.zhukovsd.endlessfield.EndlessFieldSizeConstraints;
 import com.zhukovsd.endlessfield.field.EndlessField;
 import com.zhukovsd.endlessfield.field.EndlessFieldActionInvoker;
-import com.zhukovsd.endlessfield.field.EndlessFieldCellFactory;
 import com.zhukovsd.endlessfield.field.EndlessFieldChunkFactory;
 import com.zhukovsd.endlessfield.fielddatasource.EndlessFieldDataSource;
 
@@ -36,10 +35,9 @@ import java.util.Set;
 public class MinesweeperField extends EndlessField<MinesweeperFieldCell> {
     public MinesweeperField(
             int stripes, ChunkSize chunkSize, EndlessFieldSizeConstraints sizeConstraints,
-            EndlessFieldDataSource<MinesweeperFieldCell> dataSource,
-            EndlessFieldCellFactory<MinesweeperFieldCell> cellFactory
+            EndlessFieldDataSource<MinesweeperFieldCell> dataSource
     ) {
-        super(stripes, chunkSize, sizeConstraints, dataSource, cellFactory);
+        super(stripes, chunkSize, sizeConstraints, dataSource);
     }
 
     @Override

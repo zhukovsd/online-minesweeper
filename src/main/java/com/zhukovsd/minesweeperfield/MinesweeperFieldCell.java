@@ -35,7 +35,10 @@ public class MinesweeperFieldCell extends EndlessFieldCell {
 
     // clone constructor. should be called only if source is locked, otherwise transitional state may be cloned
     private MinesweeperFieldCell(EndlessFieldCell source) {
-        super(source);
+        MinesweeperFieldCell casted = ((MinesweeperFieldCell) source);
+        this.isOpen = casted.isOpen;
+        this.hasMine = casted.hasMine;
+        this.neighbourMinesCount = casted.neighbourMinesCount;
     }
 
     @Override

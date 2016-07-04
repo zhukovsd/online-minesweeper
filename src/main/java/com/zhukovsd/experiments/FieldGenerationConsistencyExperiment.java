@@ -38,10 +38,10 @@ public class FieldGenerationConsistencyExperiment {
     private static HashMap<Integer, Integer> mineCounts = new HashMap<>();
 
     public static void main(String[] args) throws InterruptedException {
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 1000; i++) {
             run();
 
-            if ((i > 0) && (i % 1 == 0))
+            if ((i > 0) && (i % 10 == 0))
                 System.out.format(
                         "#%s, count = %s, try count = %s, ratio = %s\n",
                         i, MinesweeperFieldChunkFactory.count,
@@ -86,7 +86,6 @@ public class FieldGenerationConsistencyExperiment {
 
                     }
                 }
-                ,null
         );
 
         List<List<Integer>> lockOrder = Arrays.asList(

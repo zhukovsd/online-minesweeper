@@ -6,6 +6,14 @@
         <element id="directory" name="classes">
           <element id="module-output" name="online-minesweeper" />
         </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: com.google.code.gson:gson:2.6.2" />
+          <element id="library" level="project" name="Maven: com.google.guava:guava:19.0" />
+          <element id="library" level="project" name="Maven: javax.websocket:javax.websocket-api:1.1" />
+          <element id="library" level="project" name="Maven: org.mongodb:bson:3.2.2" />
+          <element id="library" level="project" name="Maven: org.mongodb:mongodb-driver-core:3.2.2" />
+          <element id="library" level="project" name="Maven: org.mongodb:mongodb-driver:3.2.2" />
+        </element>
       </element>
       <element id="javaee-facet-resources" facet="online-minesweeper/web/Web" />
     </root>
