@@ -19,8 +19,11 @@ package com.zhukovsd.minesweeperfield;
 
 import com.zhukovsd.endlessfield.field.EndlessCellCloneFactory;
 import com.zhukovsd.endlessfield.field.EndlessFieldCell;
+import com.zhukovsd.endlessfield.field.EndlessFieldCellView;
 import com.zhukovsd.endlessfield.field.EndlessFieldCellViewFactory;
-import com.zhukovsd.minesweeperfield.views.MinesweeperFieldCellClosedCellView;
+import com.zhukovsd.minesweeperfield.views.MinesweeperFieldCellClosedView;
+import com.zhukovsd.minesweeperfield.views.MinesweeperFieldCellFlaggedView;
+import com.zhukovsd.minesweeperfield.views.MinesweeperFieldCellOpenedView;
 
 /**
  * Created by ZhukovSD on 26.06.2016.
@@ -29,6 +32,7 @@ public class MinesweeperFieldCell extends EndlessFieldCell<MinesweeperFieldCell>
     private boolean isOpen = false;
     // TODO: 01.07.2016 private
     public boolean hasMine;
+    private boolean hasFlag = false;
     private int neighbourMinesCount = -1;
 
     public MinesweeperFieldCell(boolean hasMine) {
@@ -36,10 +40,11 @@ public class MinesweeperFieldCell extends EndlessFieldCell<MinesweeperFieldCell>
     }
 
     // clone constructor. should be called only if source is locked, otherwise transitional state may be cloned
-    private MinesweeperFieldCell(EndlessFieldCell source) {
+    private MinesweeperFieldCell(EndlessFieldCellView source) {
         MinesweeperFieldCell casted = ((MinesweeperFieldCell) source);
         this.isOpen = casted.isOpen;
         this.hasMine = casted.hasMine;
+        this.hasFlag = casted.hasFlag;
         this.neighbourMinesCount = casted.neighbourMinesCount;
     }
 
@@ -49,12 +54,15 @@ public class MinesweeperFieldCell extends EndlessFieldCell<MinesweeperFieldCell>
     }
 
     @Override
-    public EndlessFieldCellViewFactory<MinesweeperFieldCell> viewFactory() {
+    public EndlessFieldCellViewFactory viewFactory() {
         return (cell) -> {
-            if (!cell.isOpen())
-                return new MinesweeperFieldCellClosedCellView();
+            if (this.hasFlag)
+                return new MinesweeperFieldCellFlaggedView(this);
+            else if (!this.isOpen())
+                return new MinesweeperFieldCellClosedView(this);
             else
-                return this;
+//                return this;
+                return new MinesweeperFieldCellOpenedView(this);
         };
     }
 
@@ -64,6 +72,10 @@ public class MinesweeperFieldCell extends EndlessFieldCell<MinesweeperFieldCell>
 
     public boolean isOpen() {
         return isOpen;
+    }
+
+    public boolean hasFlag() {
+        return hasFlag;
     }
 
     public int neighbourMinesCount() {
@@ -77,5 +89,11 @@ public class MinesweeperFieldCell extends EndlessFieldCell<MinesweeperFieldCell>
     public void open() {
         if (!hasMine())
             isOpen = true;
+    }
+
+    public void setFlag() {
+        if (!hasFlag && hasMine) {
+            hasFlag = true;
+        }
     }
 }

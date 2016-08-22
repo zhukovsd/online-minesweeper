@@ -18,17 +18,21 @@
 package com.zhukovsd.minesweeperfield.views;
 
 import com.zhukovsd.endlessfield.field.EndlessCellCloneFactory;
-import com.zhukovsd.endlessfield.field.EndlessFieldCell;
 import com.zhukovsd.endlessfield.field.EndlessFieldCellView;
+import com.zhukovsd.minesweeperfield.MinesweeperFieldCell;
 
 /**
- * Created by ZhukovSD on 19.08.2016.
+ * Created by ZhukovSD on 20.08.2016.
  */
-public class MinesweeperFieldCellClosedCellView extends EndlessFieldCellView<EndlessFieldCell> {
-    private boolean isOpen = false;
+public class MinesweeperFieldCellFlaggedView extends EndlessFieldCellView<MinesweeperFieldCell> {
+    private boolean hasFlag = true;
+
+    private MinesweeperFieldCellFlaggedView() {}
+
+    public MinesweeperFieldCellFlaggedView(MinesweeperFieldCell viewSource) {}
 
     @Override
     public EndlessCellCloneFactory cloneFactory() {
-        return source -> new MinesweeperFieldCellClosedCellView();
+        return source -> new MinesweeperFieldCellFlaggedView();
     }
 }

@@ -33,23 +33,43 @@ MinesweeperCellsFieldViewLayer.prototype.drawCell = function(rect, cell, clear) 
         if (clear)
             c.clearRect(rect.x, rect.y, rect.width, rect.height);
 
-        c.save();        
+        c.save();
+
         if (!cell.isOpen) {
             c.beginPath();
             c.rect(rect.x, rect.y, rect.width, rect.height);
             c.fillStyle = "#E8E8E8";
             c.fill();
-        } else {
+
+            if (cell.hasFlag) console.log('draw grey');
+        } else if (cell.neighbourMinesCount > 0) {
             c.strokeStyle = "black";
             c.font = "12pt Arial";
             c.lineWidth = 1;
             c.textAlign = "center";
-            c.textBaseline="middle";
+            c.textBaseline = "middle";
 
             // todo proper alignment
             var cellSize = this.fieldView.drawSettings.cellSize;
             c.fillText(cell.neighbourMinesCount, rect.x + cellSize.width / 2, rect.y + cellSize.height / 2);
+
+            if (cell.hasFlag) console.log('draw number');
         }
+
+        if (cell.hasFlag) {
+            // c.strokeStyle = "black";
+            c.fillStyle = "black";
+            c.font = "12pt Arial";
+            c.lineWidth = 1;
+            c.textAlign = "center";
+            c.textBaseline = "middle";
+
+            // todo proper alignment
+            var cellSize = this.fieldView.drawSettings.cellSize;
+            c.fillText('⚑', rect.x + cellSize.width / 2, rect.y + cellSize.height / 2);
+            console.log('flag');
+        }
+
         c.restore();        
 
         inheritedDrawCell.call(this, rect, cell, false);

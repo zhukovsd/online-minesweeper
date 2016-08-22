@@ -21,10 +21,12 @@
 
 var MinesweeperFieldActionType = {
     OPEN_CELL: 0,
+    SET_FLAG: 1,
 
     selectByMouseButton: function(mouseButton) {
         switch(mouseButton) {
             case MouseButton.LEFT: return MinesweeperFieldActionType.OPEN_CELL;
+            case MouseButton.RIGHT: return MinesweeperFieldActionType.SET_FLAG;
         }
     }
 };
