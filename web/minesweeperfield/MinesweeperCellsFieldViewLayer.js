@@ -36,13 +36,15 @@ MinesweeperCellsFieldViewLayer.prototype.drawCell = function(rect, cell, clear) 
         c.save();
 
         if (!cell.isOpen) {
+            // fill closed cell with grey
             c.beginPath();
             c.rect(rect.x, rect.y, rect.width, rect.height);
             c.fillStyle = "#E8E8E8";
             c.fill();
 
-            if (cell.hasFlag) console.log('draw grey');
+            // if (cell.hasFlag) console.log('draw grey');
         } else if (cell.neighbourMinesCount > 0) {
+            // fill opened or blown
             c.strokeStyle = "black";
             c.font = "12pt Arial";
             c.lineWidth = 1;
@@ -53,10 +55,10 @@ MinesweeperCellsFieldViewLayer.prototype.drawCell = function(rect, cell, clear) 
             var cellSize = this.fieldView.drawSettings.cellSize;
             c.fillText(cell.neighbourMinesCount, rect.x + cellSize.width / 2, rect.y + cellSize.height / 2);
 
-            if (cell.hasFlag) console.log('draw number');
+            // if (cell.hasFlag) console.log('draw number');
         }
 
-        if (cell.hasFlag) {
+        if (cell.hasFlag || cell.mineBlown) {
             // c.strokeStyle = "black";
             c.fillStyle = "black";
             c.font = "12pt Arial";
@@ -66,12 +68,19 @@ MinesweeperCellsFieldViewLayer.prototype.drawCell = function(rect, cell, clear) 
 
             // todo proper alignment
             var cellSize = this.fieldView.drawSettings.cellSize;
-            c.fillText('⚑', rect.x + cellSize.width / 2, rect.y + cellSize.height / 2);
-            console.log('flag');
+
+            if (cell.hasFlag)
+                var text = '⚑';
+            else
+                var text = '●';
+
+            c.fillText(text, rect.x + cellSize.width / 2, rect.y + cellSize.height / 2);
+            // console.log('flag');
         }
 
         c.restore();        
 
+        // draw cell borders in the inherited draw poc
         inheritedDrawCell.call(this, rect, cell, false);
     }
 };

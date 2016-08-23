@@ -45,6 +45,7 @@ public class MinesweeperFieldSetFlagActionBehavior implements EndlessFieldAction
         synchronized (cell) {
             cell.setFlag();
         }
+        // TODO: 23.08 don't put cell into result if flag was not set
         result.put(position, cell);
 
         return result;

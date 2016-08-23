@@ -21,6 +21,7 @@ import com.zhukovsd.endlessfield.field.EndlessCellCloneFactory;
 import com.zhukovsd.endlessfield.field.EndlessFieldCell;
 import com.zhukovsd.endlessfield.field.EndlessFieldCellView;
 import com.zhukovsd.endlessfield.field.EndlessFieldCellViewFactory;
+import com.zhukovsd.minesweeperfield.views.MinesweeperFieldCellBlownView;
 import com.zhukovsd.minesweeperfield.views.MinesweeperFieldCellClosedView;
 import com.zhukovsd.minesweeperfield.views.MinesweeperFieldCellFlaggedView;
 import com.zhukovsd.minesweeperfield.views.MinesweeperFieldCellOpenedView;
@@ -30,9 +31,9 @@ import com.zhukovsd.minesweeperfield.views.MinesweeperFieldCellOpenedView;
  */
 public class MinesweeperFieldCell extends EndlessFieldCell<MinesweeperFieldCell> {
     private boolean isOpen = false;
-    // TODO: 01.07.2016 private
-    public boolean hasMine;
+    private boolean hasMine;
     private boolean hasFlag = false;
+    private boolean mineBlown = false;
     private int neighbourMinesCount = -1;
 
     public MinesweeperFieldCell(boolean hasMine) {
@@ -45,6 +46,7 @@ public class MinesweeperFieldCell extends EndlessFieldCell<MinesweeperFieldCell>
         this.isOpen = casted.isOpen;
         this.hasMine = casted.hasMine;
         this.hasFlag = casted.hasFlag;
+        this.mineBlown = casted.mineBlown;
         this.neighbourMinesCount = casted.neighbourMinesCount;
     }
 
@@ -56,12 +58,13 @@ public class MinesweeperFieldCell extends EndlessFieldCell<MinesweeperFieldCell>
     @Override
     public EndlessFieldCellViewFactory viewFactory() {
         return (cell) -> {
-            if (this.hasFlag)
+            if (this.hasFlag())
                 return new MinesweeperFieldCellFlaggedView(this);
-            else if (!this.isOpen())
+            else if (this.mineBlown()) {
+                return new MinesweeperFieldCellBlownView(this);
+            } else if (!this.isOpen())
                 return new MinesweeperFieldCellClosedView(this);
             else
-//                return this;
                 return new MinesweeperFieldCellOpenedView(this);
         };
     }
@@ -78,6 +81,10 @@ public class MinesweeperFieldCell extends EndlessFieldCell<MinesweeperFieldCell>
         return hasFlag;
     }
 
+    public boolean mineBlown() {
+        return mineBlown;
+    }
+
     public int neighbourMinesCount() {
         return neighbourMinesCount;
     }
@@ -92,8 +99,14 @@ public class MinesweeperFieldCell extends EndlessFieldCell<MinesweeperFieldCell>
     }
 
     public void setFlag() {
-        if (!hasFlag && hasMine) {
+        if (!hasFlag && hasMine && !mineBlown) {
             hasFlag = true;
+        }
+    }
+
+    public void blowMine() {
+        if (!hasFlag && hasMine) {
+            mineBlown = true;
         }
     }
 }
