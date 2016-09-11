@@ -19,11 +19,12 @@ package com.zhukovsd.minesweeperfield;
 
 import com.zhukovsd.endlessfield.field.EndlessCellCloneFactory;
 import com.zhukovsd.endlessfield.field.EndlessFieldCell;
+import com.zhukovsd.endlessfield.field.EndlessFieldCellView;
 
 /**
  * Created by ZhukovSD on 26.06.2016.
  */
-public class MinesweeperFieldCell extends EndlessFieldCell {
+public class MinesweeperFieldCell extends EndlessFieldCell<MinesweeperFieldCell> {
     private boolean isOpen = false;
     // TODO: 01.07.2016 private
     public boolean hasMine;
@@ -34,7 +35,7 @@ public class MinesweeperFieldCell extends EndlessFieldCell {
     }
 
     // clone constructor. should be called only if source is locked, otherwise transitional state may be cloned
-    private MinesweeperFieldCell(EndlessFieldCell source) {
+    private MinesweeperFieldCell(EndlessFieldCellView source) {
         MinesweeperFieldCell casted = ((MinesweeperFieldCell) source);
         this.isOpen = casted.isOpen;
         this.hasMine = casted.hasMine;
@@ -42,7 +43,7 @@ public class MinesweeperFieldCell extends EndlessFieldCell {
     }
 
     @Override
-    public EndlessCellCloneFactory getFactory() {
+    public EndlessCellCloneFactory cloneFactory() {
         return MinesweeperFieldCell::new;
     }
 

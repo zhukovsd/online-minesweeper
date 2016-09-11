@@ -25,6 +25,7 @@
 
     <script src="${pageContext.request.contextPath}/js/FieldManager.js"></script>
     <script src="${pageContext.request.contextPath}/js/FieldView.js"></script>
+    <script src="${pageContext.request.contextPath}/js/FieldViewLayerImageData.js"></script>
     <script src="${pageContext.request.contextPath}/js/AbstractFieldViewLayer.js"></script>
     <script src="${pageContext.request.contextPath}/js/CellsFieldViewLayer.js"></script>
     <script src="${pageContext.request.contextPath}/js/PlayersLabelsFieldViewLayer.js"></script>
@@ -34,8 +35,10 @@
     <script src="${pageContext.request.contextPath}/js/Camera.js"></script>
     <script src="${pageContext.request.contextPath}/js/CameraPosition.js"></script>
     <script src="${pageContext.request.contextPath}/js/Scope.js"></script>
+    <script src="${pageContext.request.contextPath}/js/ChunksScope.js"></script>
     <script src="${pageContext.request.contextPath}/js/AddressBarManager.js"></script>
     <script src="${pageContext.request.contextPath}/js/ActionMessage.js"></script>
+    <script src="${pageContext.request.contextPath}/js/SimpleBiMap.js"></script>
 
     <%--<script src="${pageContext.request.contextPath}/js/SimpleField/SimpleFieldManager.js"></script>--%>
     <script src="${pageContext.request.contextPath}/minesweeperfield/MinesweeperMouseEventListener.js"></script>
@@ -51,6 +54,8 @@
 
         var mouseEventListener = new MinesweeperMouseEventListener(fieldView, 'players-labels-layer');
         var uriManager = new AddressBarManager(contextPath + '/game/');
+
+	    fieldView.getLayer('players-labels-layer').mouseListener = mouseEventListener;
 
         fieldManager.onStateChange = function() {
             switch (fieldManager.state) {
@@ -77,8 +82,7 @@
                     }
 
                     fieldView.camera.setPosition(cameraPosition);
-                    // todo expand scope
-                    fieldManager.requestChunks(fieldView.camera.cellsScope().chunkIds(fieldManager.chunkSize, fieldManager.chunkIdFactor));
+                    fieldView.updateExpandedScopeChunkIds();
                 }
 
 //                case (FieldManagerState.LOADED): {
@@ -87,13 +91,20 @@
             }
         };
 
+        var cellsLayer = fieldView.getLayer('cells-layer');
+        var labelsLayer = fieldView.getLayer('players-labels-layer');
         fieldManager.onChunksReceived = function(chunkIds) {
-            fieldView.getLayer('cells-layer').drawCellsByChunkIds(chunkIds);
+            fieldView.forEachLayer(function(layer) {
+                layer.renderByChunkIds(chunkIds);
+                layer.display();
+            });
         };
 
         fieldManager.OnActionMessageReceived = function (positions) {
-            fieldView.getLayer('cells-layer').drawByPositions(positions);
-            fieldView.getLayer('players-labels-layer').drawVisiblePlayersLabels();
+            cellsLayer.renderByPositions(positions);
+            cellsLayer.display();
+
+            labelsLayer.refresh();
         };
 
         fieldView.camera.onPositionChanged = function(position) {

@@ -27,7 +27,7 @@ MinesweeperCellsFieldViewLayer.prototype = Object.create(CellsFieldViewLayer.pro
 
 var inheritedDrawCell = MinesweeperCellsFieldViewLayer.prototype.drawCell;
 MinesweeperCellsFieldViewLayer.prototype.drawCell = function(rect, cell, clear) {
-    var c = this.context;
+    var c = this.imageData.renderContext;
 
     if (cell != null) {
         if (clear)
@@ -52,6 +52,7 @@ MinesweeperCellsFieldViewLayer.prototype.drawCell = function(rect, cell, clear) 
         }
         c.restore();        
 
+        // draw cell borders in the inherited draw proc
         inheritedDrawCell.call(this, rect, cell, false);
     }
 };
