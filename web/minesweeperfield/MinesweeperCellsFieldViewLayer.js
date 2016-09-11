@@ -65,7 +65,13 @@ MinesweeperCellsFieldViewLayer.prototype.drawCell = function(rect, cell, clear) 
             c.textAlign = "center";
             c.textBaseline = "middle";
 
-            c.fillText('⚑', rect.x + cellSize.width / 2, rect.y + cellSize.height / 2);
+            var text;
+            if (cell.hasFlag)
+                text = '⚑';
+            else
+                text = '●';
+
+            c.fillText(text, rect.x + cellSize.width / 2, rect.y + cellSize.height / 2);
             // console.log('flag');
         }
 

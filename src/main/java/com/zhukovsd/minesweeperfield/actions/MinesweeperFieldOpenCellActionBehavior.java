@@ -66,7 +66,14 @@ public class MinesweeperFieldOpenCellActionBehavior implements EndlessFieldActio
         MinesweeperField minesweeperField = (MinesweeperField) field;
 
         MinesweeperFieldCell actionCell = minesweeperField.getCell(position);
-        if (!actionCell.isOpen() && !actionCell.hasMine()) {
+
+        if (actionCell.hasMine() && !actionCell.hasFlag() && !actionCell.mineBlown()) {
+            synchronized (actionCell) {
+                actionCell.blowMine();
+            }
+
+            result.put(position, actionCell);
+        } else if (!actionCell.isOpen() && !actionCell.hasMine()) {
 //            Map<CellPosition, MinesweeperFieldCell> entries = minesweeperField.getEntriesByChunkIds(getChunkIds(field, position));
 
             LinkedHashMap<CellPosition, MinesweeperFieldCell> cellsToOpen = new LinkedHashMap<>();

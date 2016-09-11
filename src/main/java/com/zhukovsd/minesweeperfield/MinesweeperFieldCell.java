@@ -26,9 +26,9 @@ import com.zhukovsd.endlessfield.field.EndlessFieldCellView;
  */
 public class MinesweeperFieldCell extends EndlessFieldCell<MinesweeperFieldCell> {
     private boolean isOpen = false;
-    // TODO: 01.07.2016 private
-    public boolean hasMine;
+    private boolean hasMine;
     private boolean hasFlag = false;
+    private boolean mineBlown = false;
     private int neighbourMinesCount = -1;
 
     public MinesweeperFieldCell(boolean hasMine) {
@@ -41,6 +41,7 @@ public class MinesweeperFieldCell extends EndlessFieldCell<MinesweeperFieldCell>
         this.isOpen = casted.isOpen;
         this.hasMine = casted.hasMine;
         this.hasFlag = casted.hasFlag;
+        this.mineBlown = casted.mineBlown;
         this.neighbourMinesCount = casted.neighbourMinesCount;
     }
 
@@ -61,6 +62,10 @@ public class MinesweeperFieldCell extends EndlessFieldCell<MinesweeperFieldCell>
         return hasFlag;
     }
 
+    public boolean mineBlown() {
+        return mineBlown;
+    }
+
     public int neighbourMinesCount() {
         return neighbourMinesCount;
     }
@@ -75,8 +80,14 @@ public class MinesweeperFieldCell extends EndlessFieldCell<MinesweeperFieldCell>
     }
 
     public void setFlag() {
-        if (!hasFlag && hasMine) {
+        if (!hasFlag && hasMine && !mineBlown) {
             hasFlag = true;
+        }
+    }
+
+    public void blowMine() {
+        if (!hasFlag && hasMine) {
+            mineBlown = true;
         }
     }
 }
