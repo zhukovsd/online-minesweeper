@@ -128,7 +128,7 @@
         <div>camera scope = <span id="camera-scope"></span></div>
         <div>chunks scope = <span id="chunks-scope"></span></div>
         <input type="button" value="requestChunks()" onclick="fieldManager.requestChunks();">
-        <input type="button" value="draw" onclick="fieldView.drawCellsByChunkIds([0, 1]);">
+\        <input type="button" value="draw" onclick="fieldView.renderByChunkIds([0, 1]);">
         <input type="text" name="chunk" id="chunk_id_text" value="0">
     </div>
 </body>

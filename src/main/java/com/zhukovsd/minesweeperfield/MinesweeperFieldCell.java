@@ -20,6 +20,11 @@ package com.zhukovsd.minesweeperfield;
 import com.zhukovsd.endlessfield.field.EndlessCellCloneFactory;
 import com.zhukovsd.endlessfield.field.EndlessFieldCell;
 import com.zhukovsd.endlessfield.field.EndlessFieldCellView;
+import com.zhukovsd.endlessfield.field.EndlessFieldCellViewFactory;
+import com.zhukovsd.minesweeperfield.views.MinesweeperFieldCellBlownView;
+import com.zhukovsd.minesweeperfield.views.MinesweeperFieldCellClosedView;
+import com.zhukovsd.minesweeperfield.views.MinesweeperFieldCellFlaggedView;
+import com.zhukovsd.minesweeperfield.views.MinesweeperFieldCellOpenedView;
 
 /**
  * Created by ZhukovSD on 26.06.2016.
@@ -48,6 +53,20 @@ public class MinesweeperFieldCell extends EndlessFieldCell<MinesweeperFieldCell>
     @Override
     public EndlessCellCloneFactory cloneFactory() {
         return MinesweeperFieldCell::new;
+    }
+
+    @Override
+    public EndlessFieldCellViewFactory viewFactory() {
+        return (cell) -> {
+            if (this.hasFlag())
+                return new MinesweeperFieldCellFlaggedView(this);
+            else if (this.mineBlown()) {
+                return new MinesweeperFieldCellBlownView(this);
+            } else if (!this.isOpen())
+                return new MinesweeperFieldCellClosedView(this);
+            else
+                return new MinesweeperFieldCellOpenedView(this);
+        };
     }
 
     public boolean hasMine() {
