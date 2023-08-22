@@ -133,15 +133,15 @@
         <canvas id="field-players-labels-layer-canvas"></canvas>
     </div>
 
-    <div style="position: absolute; left: 20px; top: 20px; width: 600px; height: 200px; background-color: rgba(240, 255, 255, 0.8); z-index: 100;">
-        <h3>Hi! Your session Id = <%= request.getSession().getId() %></h3>
-        <div>canvas size = <span id="canvas-size"></span></div>
-        <div>camera position = <span id="camera-position"></span></div>
-        <div>camera scope = <span id="camera-scope"></span></div>
-        <div>chunks scope = <span id="chunks-scope"></span></div>
-        <input type="button" value="requestChunks()" onclick="fieldManager.requestChunks();">
-\        <input type="button" value="draw" onclick="fieldView.renderByChunkIds([0, 1]);">
-        <input type="text" name="chunk" id="chunk_id_text" value="0">
-    </div>
+<%--    <div style="position: absolute; left: 20px; top: 20px; width: 600px; height: 200px; background-color: rgba(240, 255, 255, 0.8); z-index: 100;">--%>
+<%--        <h3>Hi! Your session Id = <%= request.getSession().getId() %></h3>--%>
+<%--        <div>canvas size = <span id="canvas-size"></span></div>--%>
+<%--        <div>camera position = <span id="camera-position"></span></div>--%>
+<%--        <div>camera scope = <span id="camera-scope"></span></div>--%>
+<%--        <div>chunks scope = <span id="chunks-scope"></span></div>--%>
+<%--        <input type="button" value="requestChunks()" onclick="fieldManager.requestChunks();">--%>
+<%--        <input type="button" value="draw" onclick="fieldView.renderByChunkIds([0, 1]);">--%>
+<%--        <input type="text" name="chunk" id="chunk_id_text" value="0">--%>
+<%--    </div>--%>
 </body>
 </html>
